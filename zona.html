@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Plataforma Barrial</title>
+  <title>Negocios por Zona</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -59,10 +59,6 @@
       margin-right: 10px;
     }
 
-    .mp {
-      background-color: #009ee3;
-    }
-
     .wa {
       background-color: #25d366;
     }
@@ -71,6 +67,14 @@
       text-align: center;
       color: #64748b;
       padding: 40px;
+    }
+
+    .volver {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #1e293b;
+      font-weight: bold;
     }
 
     footer {
@@ -89,6 +93,10 @@
 </header>
 
 <div class="container" id="listaNegocios">
+</div>
+
+<div class="container">
+  <a href="index.html" class="volver">🔙 Volver a zonas</a>
 </div>
 
 <footer>
@@ -116,7 +124,7 @@
       return;
     }
 
-    document.getElementById("tituloZona").innerText = zonaURL;
+    document.getElementById("tituloZona").innerText = "Negocios en " + zonaURL;
 
     const response = await fetch(sheetURL);
     const text = await response.text();
@@ -145,11 +153,9 @@
         card.innerHTML = `
           <h2>${nombre}</h2>
           <p><strong>Dirección:</strong> ${direccion}</p>
-          <a class="btn mp" href="https://www.mercadopago.com.ar/" target="_blank">
-            Pagar por Mercado Pago
-          </a>
+          <p><strong>Alias Mercado Pago:</strong> ${alias}</p>
           <a class="btn wa" href="https://wa.me/${whatsapp}" target="_blank">
-            WhatsApp
+            📲 WhatsApp
           </a>
         `;
 
