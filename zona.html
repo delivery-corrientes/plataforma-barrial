@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Plataforma Barrial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f4f6f9;
+    }
+
+    header {
+      background-color: #1e293b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #1e293b;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 15px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: white;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    .mp {
+      background-color: #009ee3;
+    }
+
+    .wa {
+      background-color: #25d366;
+    }
+
+    .empty {
+      text-align: center;
+      color: #64748b;
+      padding: 40px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: #64748b;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1 id="tituloZona">Cargando zona...</h1>
+</header>
+
+<div class="container" id="listaNegocios">
+</div>
+
+<footer>
+  Plataforma Barrial © 2026
+</footer>
+
+<script>
+  const sheetID = "1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk";
+  const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json`;
+
+  function obtenerZonaDesdeURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("zona");
+  }
+
+  function normalizarTexto(texto) {
+    return texto.toLowerCase().trim();
+  }
+
+  async function cargarDatos() {
+    const zonaURL = obtenerZonaDesdeURL();
+
+    if (!zonaURL) {
+      document.getElementById("tituloZona").innerText = "Zona no especificada";
+      return;
+    }
+
+    document.getElementById("tituloZona").innerText = zonaURL;
+
+    const response = await fetch(sheetURL);
+    const text = await response.text();
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+    const rows = json.table.rows;
+
+    const contenedor = document.getElementById("listaNegocios");
+    contenedor.innerHTML = "";
+
+    let encontrados = 0;
+
+    rows.forEach(row => {
+      const zona = row.c[0]?.v || "";
+      const nombre = row.c[1]?.v || "";
+      const direccion = row.c[2]?.v || "";
+      const alias = row.c[3]?.v || "";
+      const whatsapp = row.c[4]?.v || "";
+
+      if (normalizarTexto(zona) === normalizarTexto(zonaURL)) {
+
+        encontrados++;
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <h2>${nombre}</h2>
+          <p><strong>Dirección:</strong> ${direccion}</p>
+          <a class="btn mp" href="https://www.mercadopago.com.ar/" target="_blank">
+            Pagar por Mercado Pago
+          </a>
+          <a class="btn wa" href="https://wa.me/${whatsapp}" target="_blank">
+            WhatsApp
+          </a>
+        `;
+
+        contenedor.appendChild(card);
+      }
+    });
+
+    if (encontrados === 0) {
+      contenedor.innerHTML = `<div class="empty">No hay comercios cargados en esta zona aún.</div>`;
+    }
+  }
+
+  cargarDatos();
+</script>
+
+</body>
+</html>
