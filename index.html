@@ -1,42 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Plataforma Barrial</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            margin-top: 50px;
-        }
-        .zona {
-            background: white;
-            margin: 20px auto;
-            padding: 20px;
-            width: 300px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-        a {
-            text-decoration: none;
-            color: white;
-            background: #28a745;
-            padding: 10px 20px;
-            border-radius: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Plataforma Barrial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f9;
+    }
+
+    header {
+      background: #1e293b;
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .zona-btn {
+      display: block;
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #1e293b;
+      font-size: 18px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      transition: 0.2s;
+    }
+
+    .zona-btn:hover {
+      transform: translateY(-3px);
+      background: #e2e8f0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: #64748b;
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>Comprá en tu barrio. Recibí rápido.</h1>
+<header>
+  <h1>Plataforma Barrial</h1>
+  <p>Seleccioná tu zona</p>
+</header>
 
-<div class="zona">
-    <h2>Zona Centro</h2>
-    <a href="zona-centro.html">Ver negocios</a>
+<div class="container" id="listaZonas">
+  Cargando zonas...
 </div>
+
+<footer>
+  Plataforma Barrial © 2026
+</footer>
+
+<script>
+  const sheetID = "1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk";
+  const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json`;
+
+  async function cargarZonas() {
+    const response = await fetch(sheetURL);
+    const text = await response.text();
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+    const rows = json.table.rows;
+
+    const zonas = new Set();
+
+    rows.forEach(row => {
+      const zona = row.c[0]?.v;
+      if (zona) zonas.add(zona);
+    });
+
+    const contenedor = document.getElementById("listaZonas");
+    contenedor.innerHTML = "";
+
+    zonas.forEach(zona => {
+      const link = document.createElement("a");
+      link.className = "zona-btn";
+      link.href = `zona.html?zona=${encodeURIComponent(zona)}`;
+      link.innerText = zona;
+      contenedor.appendChild(link);
+    });
+
+    if (zonas.size === 0) {
+      contenedor.innerHTML = "No hay zonas cargadas aún.";
+    }
+  }
+
+  cargarZonas();
+</script>
 
 </body>
 </html>
