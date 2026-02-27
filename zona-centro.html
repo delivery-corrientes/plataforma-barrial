@@ -1,21 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Zona Centro</title>
+<meta charset="UTF-8">
+<title>Zona Centro</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: #f4f4f4;
+    }
+    .negocio {
+        background: white;
+        margin: 15px auto;
+        padding: 15px;
+        width: 320px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 8px rgba(0,0,0,0.1);
+    }
+    a {
+        text-decoration: none;
+        color: white;
+        background: #007bff;
+        padding: 8px 15px;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 8px;
+    }
+</style>
 </head>
-<body style="font-family: Arial; text-align:center;">
+<body>
 
-<h1>Zona Centro</h1>
+<h1>Negocios en Zona Centro</h1>
 
-<div style="background:#f4f4f4; padding:20px; margin:20px;">
-    <h2>Almacén Don José</h2>
-    <p>📍 Dirección: Calle Falsa 123</p>
-    <p>💳 Mercado Pago: alias.donjose</p>
-    <a href="https://wa.me/549XXXXXXXXXX">Pedir por WhatsApp</a>
+<div id="listaNegocios">
+    <p>Cargando negocios...</p>
 </div>
 
-<a href="index.html">Volver</a>
+<br>
+<a href="index.html">🔙 Volver</a>
+
+<script>
+// 👉 Este es tu link JSON de Google Sheets
+const sheetJSON = "https://docs.google.com/spreadsheets/d/1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk/gviz/tq?tqx=out:json";
+
+fetch(sheetJSON)
+  .then(res => res.text())
+  .then(rep => {
+    const jsonData = JSON.parse(rep.substr(47).slice(0, -2));
+    const rows = jsonData.table.rows;
+
+    document.getElementById("listaNegocios").innerHTML = "";
+
+    rows.forEach(r => {
+      const zona = r.c[0]?.v || "";
+      const nombre = r.c[1]?.v || "";
+      const direccion = r.c[2]?.v || "";
+      const mp = r.c[3]?.v || "";
+      const wa = r.c[4]?.v || "";
+
+      if (zona.toLowerCase() === "zona centro") {
+        document.getElementById("listaNegocios").innerHTML += `
+          <div class="negocio">
+            <h3>${nombre}</h3>
+            <p>${direccion}</p>
+            <p>Mercado Pago: <strong>${mp}</strong></p>
+            <a href="https://wa.me/${wa}">📲 WhatsApp</a>
+          </div>
+        `;
+      }
+    });
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById("listaNegocios").innerHTML = "<p>Error cargando negocios.</p>";
+  });
+</script>
 
 </body>
 </html>
