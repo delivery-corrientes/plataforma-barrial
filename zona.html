@@ -1,174 +1,91 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Negocios por Zona</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #f4f6f9;
-    }
-
-    header {
-      background-color: #1e293b;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
-    }
-
-    .card {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-      transition: 0.2s;
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
-    }
-
-    .card h2 {
-      margin-top: 0;
-      color: #1e293b;
-    }
-
-    .btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 15px;
-      border-radius: 6px;
-      text-decoration: none;
-      color: white;
-      font-size: 14px;
-      margin-right: 10px;
-    }
-
-    .wa {
-      background-color: #25d366;
-    }
-
-    .empty {
-      text-align: center;
-      color: #64748b;
-      padding: 40px;
-    }
-
-    .volver {
-      display: inline-block;
-      margin-top: 20px;
-      text-decoration: none;
-      color: #1e293b;
-      font-weight: bold;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 13px;
-      color: #64748b;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Negocios por Zona</title>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f2f2f2;
+    margin:0;
+}
+header{
+    background:#1e2a3a;
+    color:white;
+    padding:20px;
+    text-align:center;
+}
+.container{
+    max-width:900px;
+    margin:30px auto;
+}
+.card{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:8px;
+    box-shadow:0 4px 8px rgba(0,0,0,0.1);
+}
+button{
+    background:#25D366;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:5px;
+    cursor:pointer;
+}
+</style>
 </head>
-
 <body>
 
 <header>
-  <h1 id="tituloZona">Cargando zona...</h1>
+<h1>Negocios en zona</h1>
 </header>
 
-<div class="container" id="listaNegocios">
-</div>
-
-<div class="container">
-  <a href="index.html" class="volver">🔙 Volver a zonas</a>
-</div>
-
-<footer>
-  Plataforma Barrial © 2026
-</footer>
+<div class="container" id="lista"></div>
 
 <script>
-  const sheetID = "1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk";
-  const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json`;
 
-  function obtenerZonaDesdeURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("zona");
-  }
+const urlParams = new URLSearchParams(window.location.search);
+const zonaSeleccionada = urlParams.get("zona");
 
-  function normalizarTexto(texto) {
-    return texto.toLowerCase().trim();
-  }
+const url = "https://opensheet.elk.sh/1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk/Hoja1";
 
-  async function cargarDatos() {
-    const zonaURL = obtenerZonaDesdeURL();
+fetch(url)
+.then(res => res.json())
+.then(data => {
 
-    if (!zonaURL) {
-      document.getElementById("tituloZona").innerText = "Zona no especificada";
-      return;
+    const lista = document.getElementById("lista");
+
+    const filtrados = data.filter(item => 
+        item.zona && item.zona.trim() === zonaSeleccionada
+    );
+
+    if(filtrados.length === 0){
+        lista.innerHTML = "<p>No hay negocios en esta zona.</p>";
+        return;
     }
 
-    document.getElementById("tituloZona").innerText = "Negocios en " + zonaURL;
+    filtrados.forEach(item => {
 
-    const response = await fetch(sheetURL);
-    const text = await response.text();
-    const json = JSON.parse(text.substring(47).slice(0, -2));
-    const rows = json.table.rows;
-
-    const contenedor = document.getElementById("listaNegocios");
-    contenedor.innerHTML = "";
-
-    let encontrados = 0;
-
-    rows.forEach(row => {
-      const zona = row.c[0]?.v || "";
-      const nombre = row.c[1]?.v || "";
-      const direccion = row.c[2]?.v || "";
-      const alias = row.c[3]?.v || "";
-      const whatsapp = row.c[4]?.v || "";
-
-      if (normalizarTexto(zona) === normalizarTexto(zonaURL)) {
-
-        encontrados++;
-
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-          <h2>${nombre}</h2>
-          <p><strong>Dirección:</strong> ${direccion}</p>
-          <p><strong>Alias Mercado Pago:</strong> ${alias}</p>
-          <a class="btn wa" href="https://wa.me/${whatsapp}" target="_blank">
-            📲 WhatsApp
-          </a>
+        lista.innerHTML += `
+        <div class="card">
+            <h2>${item.nombre}</h2>
+            <p><strong>Dirección:</strong> ${item.direccion}</p>
+            <p><strong>Alias Mercado Pago:</strong> ${item.mercado_pago}</p>
+            <a href="https://wa.me/${item.whatsapp}" target="_blank">
+                <button>WhatsApp</button>
+            </a>
+        </div>
         `;
 
-        contenedor.appendChild(card);
-      }
     });
 
-    if (encontrados === 0) {
-      contenedor.innerHTML = `<div class="empty">No hay comercios cargados en esta zona aún.</div>`;
-    }
-  }
+})
+.catch(error => {
+    console.error("Error:", error);
+});
 
-  cargarDatos();
 </script>
 
 </body>
