@@ -34,22 +34,33 @@ button{
     border-radius:5px;
     cursor:pointer;
 }
+.volver{
+    display:block;
+    text-align:center;
+    margin-top:30px;
+}
 </style>
 </head>
 <body>
 
 <header>
-<h1>Negocios en zona</h1>
+<h1 id="tituloZona">Negocios</h1>
 </header>
 
 <div class="container" id="lista"></div>
+
+<div class="volver">
+<a href="index.html">⬅ Volver</a>
+</div>
 
 <script>
 
 const urlParams = new URLSearchParams(window.location.search);
 const zonaSeleccionada = urlParams.get("zona");
 
-const url = "https://opensheet.elk.sh/1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk/Hoja1";
+document.getElementById("tituloZona").innerText = "Negocios en " + zonaSeleccionada;
+
+const url = "https://opensheet.elk.sh/1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk/Hoja%201";
 
 fetch(url)
 .then(res => res.json())
