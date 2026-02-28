@@ -49,7 +49,7 @@ Plataforma Barrial © 2026
 
 <script>
 
-const url = "https://opensheet.elk.sh/1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk/Hoja1";
+const url = "https://opensheet.elk.sh/1cYkxT4OBGHnd2EzeMZA5kJfTkSZvfCUEeNubTIWeWxk/Hoja%201";
 
 fetch(url)
 .then(res => res.json())
@@ -57,7 +57,6 @@ fetch(url)
 
     const contenedor = document.getElementById("zonas");
 
-    // Obtener zonas únicas
     const zonasUnicas = [...new Set(data.map(item => item.zona))];
 
     zonasUnicas.forEach(zona => {
